@@ -7,15 +7,43 @@
     <style>
         /* Description Section */
 .description {
+    display: flex; /* Arrange children side by side */
+    align-items: center;
+    justify-content: space-between;
     background: white;
     padding: 25px;
-    text-align: center;
     font-size: 18px;
     line-height: 1.6;
-    max-width: 800px;
+    max-width: 1000px; /* Increase width to fit text + banner */
     margin: 30px auto;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    gap: 20px; /* Space between text and banner */
+}
+@media (max-width: 768px) {
+    .description {
+        flex-direction: column; /* Stack text and banner on small screens */
+    }
+
+    .desc-banner, .desc-text {
+        width: 100%;
+    }
+}
+
+.desc-text {
+    flex: 1; /* Take remaining space */
+}
+
+.desc-banner {
+    flex: 1; /* Take remaining space */
+    text-align: center;
+}
+
+.desc-banner img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
 }
 
         body {
@@ -207,6 +235,9 @@
         and passion for the open road — made from premium fabric for comfort and style. 
         Ride bold. Wear THROTTLES.
     </p>
+     <div class="desc-banner">
+        <img src="https://i.ibb.co/Yc7V1zS/banner.jpg" alt="Banner">
+    </div>
 </div>
 
 <nav>
@@ -366,4 +397,5 @@ function addReview() {
 
 </body>
 </html>
+
 
