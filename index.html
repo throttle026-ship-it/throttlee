@@ -14,7 +14,7 @@ nav a:hover { text-decoration:underline; }
 h2 { text-align:center; margin-top:40px; }
 .category { text-align:center; margin:20px 0; }
 .container { display:flex; flex-wrap:wrap; justify-content:center; padding:15px; }
-.item { width:280px; background:white; margin:15px; padding:15px; border-radius:12px; text-align:center; box-shadow:0px 0px 10px rgba(0,0,0,0.15); transition:0.3s; }
+.item { width:280px; background:white; margin:15px; padding:15px; border-radius:12px; text-align:center; box-shadow:0px 0px 10px rgba(0,0,0,0.15); transition:0.3s; cursor:pointer; }
 .item:hover { transform:translateY(-5px); box-shadow:0px 5px 15px rgba(0,0,0,0.3); }
 .item img { width:100%; border-radius:10px; }
 .price { color:#e63946; font-size:20px; margin:10px 0; }
@@ -34,13 +34,14 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
 .desc-banner img { max-width:100%; border-radius:10px; }
 @media (max-width:768px){ .description { flex-direction:column; } .desc-banner, .desc-text { width:100%; } }
 @media (max-width:600px){ .hero { font-size:24px; padding:20px; } .item { width:90%; } }
-.modal-bg { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
-.modal { background:white; padding:30px; border-radius:10px; max-width:400px; text-align:center; box-shadow:0 0 20px rgba(0,0,0,0.3); }
-#cart-modal .modal { max-width:500px; text-align:left; }
-#cart-items div { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #ddd; }
-#cart-items button { background:#e63946; margin:0; padding:5px 10px; border-radius:5px; }
+.modal-bg, .cart-modal-bg, .quickview-bg { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
+.modal, #cart-modal, #quickview-modal { background:white; padding:30px; border-radius:10px; max-width:500px; text-align:center; box-shadow:0 0 20px rgba(0,0,0,0.3); }
+#cart-items div { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #ddd; align-items:center; }
+#cart-items button { background:#e63946; margin:0 0 0 10px; padding:5px 10px; border-radius:5px; }
 .search-bar { text-align:center; margin:20px; }
-.search-bar input { width:60%; padding:10px; font-size:16px; border-radius:5px; border:1px solid #ccc; }
+.search-bar input, .filter-bar select { width:60%; padding:10px; font-size:16px; border-radius:5px; border:1px solid #ccc; margin:5px; }
+.quantity-btn { padding:5px 10px; background:#555; color:white; border:none; border-radius:5px; cursor:pointer; }
+.quantity-btn:hover { background:#333; }
 </style>
 </head>
 <body>
@@ -52,7 +53,7 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
 
 <div class="description">
     <div class="desc-text">
-        <p><strong>THROTTLES</strong> brings you high-quality, stylish printed T-shirts crafted for GENZ. Ride bold. Wear THROTTLES.</p>
+        <p><strong>THROTTLES</strong> brings you high-quality, stylish printed T-shirts crafted for riders and bike lovers. Ride bold. Wear THROTTLES.</p>
     </div>
     <div class="desc-banner">
         <img src="https://raw.githubusercontent.com/throttle026-ship-it/throttlee/main/dhink.png" alt="Banner">
@@ -74,11 +75,24 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
     <input type="text" id="searchInput" placeholder="Search products..." onkeyup="filterProducts()">
 </div>
 
+<div class="filter-bar" style="text-align:center;">
+    <select id="sizeFilter" onchange="filterProducts()">
+        <option value="">All Sizes</option>
+        <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+    </select>
+    <select id="priceFilter" onchange="filterProducts()">
+        <option value="">All Prices</option>
+        <option value="0-500">₹0-500</option>
+        <option value="501-600">₹501-600</option>
+        <option value="601-1000">₹601+</option>
+    </select>
+</div>
+
 <h2 id="men">Men's Collection</h2>
 <div class="container" id="product-container">
     <!-- Product Template -->
-    <div class="item" data-name="Rider Print Tee">
-        <img src="https://i.ibb.co/5r0z9Wj/moto1.jpg" alt="T-shirt 1">
+    <div class="item" data-name="Rider Print Tee" data-price="499" data-size="S,M,L,XL">
+        <img src="https://i.ibb.co/5r0z9Wj/moto1.jpg" alt="T-shirt 1" onclick="openQuickView(this)">
         <h3>Rider Print Tee</h3>
         <p class="price">₹499</p>
         <label>Size:
@@ -93,8 +107,8 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
         <button onclick="addToCart(this)">Add to Cart</button>
         <button onclick="orderModal('Rider Print Tee')">Order</button>
     </div>
-    <div class="item" data-name="Throttle Beast Tee">
-        <img src="https://i.ibb.co/6sd9CFK/moto2.jpg" alt="T-shirt 2">
+    <div class="item" data-name="Throttle Beast Tee" data-price="599" data-size="S,M,L,XL">
+        <img src="https://i.ibb.co/6sd9CFK/moto2.jpg" alt="T-shirt 2" onclick="openQuickView(this)">
         <h3>Throttle Beast Tee</h3>
         <p class="price">₹599</p>
         <label>Size:
@@ -109,28 +123,12 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
         <button onclick="addToCart(this)">Add to Cart</button>
         <button onclick="orderModal('Throttle Beast Tee')">Order</button>
     </div>
-    <div class="item" data-name="Bike Lover Tee">
-        <img src="https://i.ibb.co/0yqbgRV/moto3.jpg" alt="T-shirt 3">
-        <h3>Bike Lover Tee</h3>
-        <p class="price">₹549</p>
-        <label>Size:
-            <select class="size">
-                <option value="S">S</option><option value="M" selected>M</option><option value="L">L</option><option value="XL">XL</option>
-            </select>
-        </label><br>
-        <label>Quantity:
-            <input type="number" class="qty" value="1" min="1" style="width:50px;" onchange="updateItemTotal(this)">
-        </label>
-        <p class="total-price">Total: ₹549</p>
-        <button onclick="addToCart(this)">Add to Cart</button>
-        <button onclick="orderModal('Bike Lover Tee')">Order</button>
-    </div>
 </div>
 
 <h2 id="ladies">Ladies Collection</h2>
-<div class="container">
-    <div class="item" data-name="Lady Rider Tee">
-        <img src="https://i.ibb.co/bQFR3t8/lady1.jpg" alt="Ladies T-shirt 1">
+<div class="container" id="ladies-container">
+    <div class="item" data-name="Lady Rider Tee" data-price="499" data-size="S,M,L,XL">
+        <img src="https://i.ibb.co/bQFR3t8/lady1.jpg" alt="Ladies T-shirt 1" onclick="openQuickView(this)">
         <h3>Lady Rider Tee</h3>
         <p class="price">₹499</p>
         <label>Size:
@@ -144,22 +142,6 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
         <p class="total-price">Total: ₹499</p>
         <button onclick="addToCart(this)">Add to Cart</button>
         <button onclick="orderModal('Lady Rider Tee')">Order</button>
-    </div>
-    <div class="item" data-name="Throttle Queen Tee">
-        <img src="https://i.ibb.co/CKc9LhG/lady2.jpg" alt="Ladies T-shirt 2">
-        <h3>Throttle Queen Tee</h3>
-        <p class="price">₹599</p>
-        <label>Size:
-            <select class="size">
-                <option value="S">S</option><option value="M" selected>M</option><option value="L">L</option><option value="XL">XL</option>
-            </select>
-        </label><br>
-        <label>Quantity:
-            <input type="number" class="qty" value="1" min="1" style="width:50px;" onchange="updateItemTotal(this)">
-        </label>
-        <p class="total-price">Total: ₹599</p>
-        <button onclick="addToCart(this)">Add to Cart</button>
-        <button onclick="orderModal('Throttle Queen Tee')">Order</button>
     </div>
 </div>
 
@@ -190,13 +172,22 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
     </div>
 </div>
 
-<div class="modal-bg" id="cart-modal-bg">
+<div class="cart-modal-bg" id="cart-modal-bg">
     <div class="modal" id="cart-modal">
         <h3>Your Cart</h3>
         <div id="cart-items"></div>
         <p id="cart-total"></p>
         <button onclick="checkoutCart()">Proceed to Order</button>
         <button onclick="closeCartModal()">Close</button>
+    </div>
+</div>
+
+<div class="quickview-bg" id="quickview-bg">
+    <div class="modal" id="quickview-modal">
+        <img id="quickview-img" src="" style="width:100%; border-radius:10px; margin-bottom:15px;">
+        <h3 id="quickview-name"></h3>
+        <p id="quickview-price"></p>
+        <button onclick="closeQuickView()">Close</button>
     </div>
 </div>
 
@@ -245,13 +236,24 @@ function viewCart(){
         cart.forEach((i,idx)=>{
             total+=i.totalPrice;
             const div=document.createElement('div');
-            div.innerHTML=`<span>${i.name} - ${i.size} - ${i.quantity} pcs - ₹${i.totalPrice}</span>
-                           <button onclick="removeFromCart(${idx})">Remove</button>`;
+            div.innerHTML=`<span>${i.name} - ${i.size} - ₹${i.price} x ${i.quantity} = ₹${i.totalPrice}</span>
+                           <div>
+                             <button class="quantity-btn" onclick="changeQty(${idx},-1)">-</button>
+                             <button class="quantity-btn" onclick="changeQty(${idx},1)">+</button>
+                             <button onclick="removeFromCart(${idx})">Remove</button>
+                           </div>`;
             cartItemsDiv.appendChild(div);
         });
         cartTotalP.textContent='Total: ₹'+total;
     }
     cartModalBg.style.display='flex';
+}
+function changeQty(idx,delta){
+    cart[idx].quantity += delta;
+    if(cart[idx].quantity < 1) cart[idx].quantity = 1;
+    cart[idx].totalPrice = cart[idx].price * cart[idx].quantity;
+    localStorage.setItem('cart', JSON.stringify(cart));
+    viewCart();
 }
 function removeFromCart(idx){ cart.splice(idx,1); localStorage.setItem('cart',JSON.stringify(cart)); updateCartCount(); viewCart(); }
 function closeCartModal(){ document.getElementById('cart-modal-bg').style.display='none'; }
@@ -290,16 +292,33 @@ function closeModal(){ document.getElementById('modal-bg').style.display='none';
 function orderWhatsApp(){ window.open("https://wa.me/918627892967?text="+encodeURIComponent("Hi! I want to order: "+currentProduct),"_blank"); closeModal(); }
 function orderInstagram(){ window.open("https://instagram.com/_hxrshit.___","_blank"); closeModal(); }
 
-// Search / Filter
+// Quick View
+function openQuickView(img){
+    const item = img.closest('.item');
+    document.getElementById('quickview-img').src = img.src;
+    document.getElementById('quickview-name').textContent = item.querySelector('h3').textContent;
+    document.getElementById('quickview-price').textContent = item.querySelector('.price').textContent;
+    document.getElementById('quickview-bg').style.display='flex';
+}
+function closeQuickView(){ document.getElementById('quickview-bg').style.display='none'; }
+
+// Filtering
 function filterProducts(){
-    const input = document.getElementById('searchInput').value.toLowerCase();
-    const items = document.querySelectorAll('.item');
-    items.forEach(i=>{
-        const name=i.dataset.name.toLowerCase();
-        i.style.display=name.includes(input)?'block':'none';
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const sizeFilter = document.getElementById('sizeFilter').value;
+    const priceFilter = document.getElementById('priceFilter').value;
+    document.querySelectorAll('.item').forEach(item=>{
+        let name = item.dataset.name.toLowerCase();
+        let sizes = item.dataset.size.split(',');
+        let price = parseInt(item.dataset.price);
+        let match = name.includes(search) && (sizeFilter==='' || sizes.includes(sizeFilter)) &&
+                    (priceFilter==='' || (priceFilter==='0-500' && price<=500) ||
+                     (priceFilter==='501-600' && price>=501 && price<=600) ||
+                     (priceFilter==='601+' && price>=601));
+        item.style.display = match ? 'block' : 'none';
     });
 }
 </script>
+
 </body>
 </html>
-
