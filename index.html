@@ -48,6 +48,11 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
 .modal-bg { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
 .modal { background:white; padding:30px; border-radius:10px; max-width:400px; text-align:center; box-shadow:0 0 20px rgba(0,0,0,0.3); }
 .modal button { width:80%; margin:10px 0; }
+
+/* Cart Modal */
+#cart-modal .modal { max-width:500px; text-align:left; }
+#cart-items div { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #ddd; }
+#cart-items button { background:#e63946; margin:0; padding:5px 10px; border-radius:5px; }
 </style>
 </head>
 <body>
@@ -150,6 +155,17 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
     </div>
 </div>
 
+<!-- CART MODAL -->
+<div class="modal-bg" id="cart-modal-bg">
+    <div class="modal" id="cart-modal">
+        <h3>Your Cart</h3>
+        <div id="cart-items"></div>
+        <p id="cart-total"></p>
+        <button onclick="checkoutCart()">Proceed to Order</button>
+        <button onclick="closeCartModal()">Close</button>
+    </div>
+</div>
+
 <script>
 // Persistent Cart
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -172,18 +188,60 @@ function updateCartCount(){
     document.getElementById('cart-count').textContent = cart.length;
 }
 
-// View Cart
-function viewCart(){
-    if(cart.length===0){ alert("Your cart is empty!"); return; }
-    let total=0, msg="Your Cart:\n\n";
-    cart.forEach((item,i)=>{ msg += `${i+1}. ${item.name} - ₹${item.price}\n`; total+=item.price; });
-    msg += `\nTotal: ₹${total}\n\nProceed to order on WhatsApp?`;
-    if(confirm(msg)){
-        let message = "Hi! I want to order the following items:\n";
-        cart.forEach(i=>message+="- "+i.name+" (₹"+i.price+")\n");
-        message += "\nTotal: ₹"+total;
-        window.open("https://wa.me/918627892967?text="+encodeURIComponent(message), "_blank");
+// View Cart Modal
+function viewCart() {
+    const cartModalBg = document.getElementById('cart-modal-bg');
+    const cartItemsDiv = document.getElementById('cart-items');
+    const cartTotalP = document.getElementById('cart-total');
+
+    cartItemsDiv.innerHTML = '';
+    let total = 0;
+
+    if(cart.length === 0){
+        cartItemsDiv.innerHTML = "<p>Your cart is empty!</p>";
+        cartTotalP.textContent = '';
+    } else {
+        cart.forEach((item, index) => {
+            total += item.price;
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <span>${item.name} - ₹${item.price}</span>
+                <button onclick="removeFromCart(${index})">Remove</button>
+            `;
+            cartItemsDiv.appendChild(div);
+        });
+        cartTotalP.textContent = "Total: ₹" + total;
     }
+
+    cartModalBg.style.display = 'flex';
+}
+
+// Remove item from cart
+function removeFromCart(index){
+    alert(cart[index].name + " removed from cart!");
+    cart.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    viewCart(); // Refresh modal
+}
+
+// Close Cart Modal
+function closeCartModal(){
+    document.getElementById('cart-modal-bg').style.display = 'none';
+}
+
+// Checkout / Proceed to WhatsApp
+function checkoutCart(){
+    if(cart.length === 0){ alert("Your cart is empty!"); return; }
+    let message = "Hi! I want to order the following items:\n";
+    let total = 0;
+    cart.forEach(i => { 
+        message += "- " + i.name + " (₹" + i.price + ")\n"; 
+        total += i.price; 
+    });
+    message += "\nTotal: ₹" + total;
+    window.open("https://wa.me/918627892967?text=" + encodeURIComponent(message), "_blank");
+    closeCartModal();
 }
 
 // Reviews
