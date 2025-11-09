@@ -89,21 +89,54 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
         <img src="https://i.ibb.co/5r0z9Wj/moto1.jpg" alt="T-shirt 1">
         <h3>Rider Print Tee</h3>
         <p class="price">₹499</p>
-        <button onclick="addToCart('Rider Print Tee',499)">Add to Cart</button>
+        <label>Size:
+            <select id="size1">
+                <option value="S">S</option>
+                <option value="M" selected>M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+            </select>
+        </label><br>
+        <label>Quantity:
+            <input type="number" id="qty1" value="1" min="1" style="width:50px;">
+        </label><br>
+        <button onclick="addToCart('Rider Print Tee',499, document.getElementById('size1').value, parseInt(document.getElementById('qty1').value))">Add to Cart</button>
         <button onclick="orderModal('Rider Print Tee')">Order</button>
     </div>
     <div class="item">
         <img src="https://i.ibb.co/6sd9CFK/moto2.jpg" alt="T-shirt 2">
         <h3>Throttle Beast Tee</h3>
         <p class="price">₹599</p>
-        <button onclick="addToCart('Throttle Beast Tee',599)">Add to Cart</button>
+        <label>Size:
+            <select id="size2">
+                <option value="S">S</option>
+                <option value="M" selected>M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+            </select>
+        </label><br>
+        <label>Quantity:
+            <input type="number" id="qty2" value="1" min="1" style="width:50px;">
+        </label><br>
+        <button onclick="addToCart('Throttle Beast Tee',599, document.getElementById('size2').value, parseInt(document.getElementById('qty2').value))">Add to Cart</button>
         <button onclick="orderModal('Throttle Beast Tee')">Order</button>
     </div>
     <div class="item">
         <img src="https://i.ibb.co/0yqbgRV/moto3.jpg" alt="T-shirt 3">
         <h3>Bike Lover Tee</h3>
         <p class="price">₹549</p>
-        <button onclick="addToCart('Bike Lover Tee',549)">Add to Cart</button>
+        <label>Size:
+            <select id="size3">
+                <option value="S">S</option>
+                <option value="M" selected>M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+            </select>
+        </label><br>
+        <label>Quantity:
+            <input type="number" id="qty3" value="1" min="1" style="width:50px;">
+        </label><br>
+        <button onclick="addToCart('Bike Lover Tee',549, document.getElementById('size3').value, parseInt(document.getElementById('qty3').value))">Add to Cart</button>
         <button onclick="orderModal('Bike Lover Tee')">Order</button>
     </div>
 </div>
@@ -115,14 +148,36 @@ footer { background:#000; color:white; padding:20px; text-align:center; margin-t
         <img src="https://i.ibb.co/bQFR3t8/lady1.jpg" alt="Ladies T-shirt 1">
         <h3>Lady Rider Tee</h3>
         <p class="price">₹499</p>
-        <button onclick="addToCart('Lady Rider Tee',499)">Add to Cart</button>
+        <label>Size:
+            <select id="size4">
+                <option value="S" selected>S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+            </select>
+        </label><br>
+        <label>Quantity:
+            <input type="number" id="qty4" value="1" min="1" style="width:50px;">
+        </label><br>
+        <button onclick="addToCart('Lady Rider Tee',499, document.getElementById('size4').value, parseInt(document.getElementById('qty4').value))">Add to Cart</button>
         <button onclick="orderModal('Lady Rider Tee')">Order</button>
     </div>
     <div class="item">
         <img src="https://i.ibb.co/CKc9LhG/lady2.jpg" alt="Ladies T-shirt 2">
         <h3>Throttle Queen Tee</h3>
         <p class="price">₹599</p>
-        <button onclick="addToCart('Throttle Queen Tee',599)">Add to Cart</button>
+        <label>Size:
+            <select id="size5">
+                <option value="S">S</option>
+                <option value="M" selected>M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+            </select>
+        </label><br>
+        <label>Quantity:
+            <input type="number" id="qty5" value="1" min="1" style="width:50px;">
+        </label><br>
+        <button onclick="addToCart('Throttle Queen Tee',599, document.getElementById('size5').value, parseInt(document.getElementById('qty5').value))">Add to Cart</button>
         <button onclick="orderModal('Throttle Queen Tee')">Order</button>
     </div>
 </div>
@@ -176,14 +231,16 @@ let reviews = JSON.parse(localStorage.getItem('reviews')) || [];
 const reviewList = document.getElementById('review-list');
 reviews.forEach(r => appendReview(r.name, r.text));
 
-// Add to Cart
-function addToCart(name, price){
-    cart.push({name, price});
+// Add to Cart with size & quantity
+function addToCart(name, price, size, quantity){
+    const totalPrice = price * quantity;
+    cart.push({name, price, size, quantity, totalPrice});
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCount();
-    alert(name + " added to cart!");
+    alert(quantity + " x " + name + " (" + size + ") added to cart!");
 }
 
+// Update cart count
 function updateCartCount(){
     document.getElementById('cart-count').textContent = cart.length;
 }
@@ -202,10 +259,10 @@ function viewCart() {
         cartTotalP.textContent = '';
     } else {
         cart.forEach((item, index) => {
-            total += item.price;
+            total += item.totalPrice;
             const div = document.createElement('div');
             div.innerHTML = `
-                <span>${item.name} - ₹${item.price}</span>
+                <span>${item.name} - ${item.size} - ${item.quantity} pcs - ₹${item.totalPrice}</span>
                 <button onclick="removeFromCart(${index})">Remove</button>
             `;
             cartItemsDiv.appendChild(div);
@@ -222,7 +279,7 @@ function removeFromCart(index){
     cart.splice(index, 1);
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCount();
-    viewCart(); // Refresh modal
+    viewCart();
 }
 
 // Close Cart Modal
@@ -236,8 +293,8 @@ function checkoutCart(){
     let message = "Hi! I want to order the following items:\n";
     let total = 0;
     cart.forEach(i => { 
-        message += "- " + i.name + " (₹" + i.price + ")\n"; 
-        total += i.price; 
+        message += `- ${i.name} (${i.size}) x${i.quantity} = ₹${i.totalPrice}\n`;
+        total += i.totalPrice; 
     });
     message += "\nTotal: ₹" + total;
     window.open("https://wa.me/918627892967?text=" + encodeURIComponent(message), "_blank");
